@@ -1,11 +1,16 @@
-::-webkit-scrollbar {
-  display: none;
+*{
+    margin: 0;
+    padding: 0;
 }
 
-.dashboard-card{
-  height: 200px;
+body{
+    overflow-x: hidden;
 }
 
-.dashboard-card.dashboard-card-add{
-  background-color: rgba(228, 235, 255, 0.514);
+.content{
+  width: 100svw !important;
+}
+
+ol{
+  --bs-breadcrumb-margin-bottom: 0 !important
 }

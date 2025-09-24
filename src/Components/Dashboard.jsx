@@ -1,68 +1,37 @@
-import { Add } from '@mui/icons-material';
-import { Button } from '@mui/material';
-import { useState } from 'react';
-import DashboardCard from './DashboardCard';
+import { Container, Row, Col, Card, Button } from 'react-bootstrap'
+import Widget from './Widget'
+import { useMediaQuery } from 'react-responsive'
 
-const Dashboard = ({ category, isSearching, handleAdd, handleRemove }) => {
-    
-    let { widgets } = category
+function Dashboard({search, filteredWidgets, currentWidgets, handleSidebarAdd}) {
 
-    const [widgetDetails, setWidgetDetails] = useState({ title: '', data: '', id: '', category: category.id })
+  let isMobile = useMediaQuery({maxWidth: 450})
 
-    const [isAdding, setIsAdding] = useState(false)
-    
-    const handleIsAdding = () => {
-        setIsAdding(true)
-    }
-
-    const handleChange = (event) =>{
-        let {name, value} = event.target;
-
-        setWidgetDetails({...widgetDetails, [name]: value, id: new Date().getTime()})
-    }
-
-    const handleSubmit = (event) =>{
-        event.preventDefault()
-        if(widgetDetails.title !== '' || widgetDetails.data !== ''){
-            handleAdd(widgetDetails)
-            setWidgetDetails({title: '', data: '', id: '', category: category.id})
-            setIsAdding(false)
-        }
-        else{
-            alert('Please Write All Inputs')
-        }
-    }
-
-    return (
-        <div className="container-fluid pb-3">
-            <h5>{isSearching && widgets.length === 0 ? '' : category.name}</h5>
-            <div className="row g-3">
-                {widgets.map(widget => {
-                    return <DashboardCard widget={widget} handleRemove={handleRemove} key={widget.id} />
-                }).concat( !isSearching &&
-                    <div className="col-lg-4 col-12" key={`${category}-add-widget`}>
-                        <div className="dashboard-card dashboard-card-add shadow rounded d-flex justify-content-center align-items-center">
-                            {isAdding ? <form onSubmit={handleSubmit}>
-                                <div className="form-group mb-2">
-                                    <label className='form-label'>Title: </label>
-                                    <input type="text" name='title' className='ms-2 form-control-sm' value={widgetDetails.title} onChange={handleChange} style={{ border: 'none', outline: 'none' }} />
-                                </div>
-                                <div className="form-group mb-2">
-                                    <label className='form-label'>Data: </label>
-                                    <input type="text" name='data' className='ms-1 form-control-sm' value={widgetDetails.data} onChange={handleChange} style={{ border: 'none', outline: 'none' }} />
-                                </div>
-                                <div className="d-flex justify-content-center">
-                                    <button type='submit' className='btn btn-sm btn-primary mx-auto'>Add</button>
-                                </div>
-                            </form>
-                                : <Button onClick={handleIsAdding} size='medium' variant='outlined'><Add /> <span className='ps-2'>Add Widgets</span></Button>
-                            }
-                        </div>
-                    </div>
-                )}
-            </div>
-        </div>
-    )
+  return (
+       <Container fluid className='px-lg-5'>
+        <Row className='mx-0'>
+          { search ? filteredWidgets.map((filteredWidget)=>{
+            return <Col sm={12} className={`mb-lg-3 mb-4 ${filteredWidget.widgets.length > 0 ? '' : 'd-none'}`} key={filteredWidget.id}>
+              { isMobile ? <h6>{filteredWidget.title}</h6> : <h5>{filteredWidget.title}</h5>}
+              <Row className='g-2'>
+              {filteredWidget.widgets.map(widget=><Widget widget={widget} key={widget.id}/>)}
+              </Row>
+            </Col>
+          }): currentWidgets.map((currentWidget, index)=>{
+            return <Col sm={12} className='mb-lg-3 mb-4' key={currentWidget.id}>
+              { isMobile ?  <h6>{currentWidget.title}</h6> : <h5>{currentWidget.title}</h5>}
+              <Row className='g-2'>
+              {currentWidget.widgets.map(widget=><Widget widget={widget} key={widget.id}/>)}
+              <Col lg={4} md={10}>
+                <Card className='bg-light d-flex justify-content-center align-items-center' style={{height: '225px'}}>
+                  <Button className='btn bg-light text-dark btn-outline-dark' onClick={()=>{handleSidebarAdd(currentWidget.category, index)}}>+ Add Widget</Button>
+                </Card>
+              </Col>
+              </Row>
+            </Col>
+          })}
+        </Row>
+      </Container>
+  )
 }
 
 export default Dashboard
